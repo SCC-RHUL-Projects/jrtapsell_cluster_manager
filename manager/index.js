@@ -1,12 +1,11 @@
 const Docker = require('dockerode');
 const docker = new Docker({socketPath: '/var/run/docker.sock'});
-const promisify = require("util").promisify;
 const _ = require("lodash");
 const chalk = require("chalk");
 
-const projectName = "mongosharded";
+const {insertToDatabase} = require("./insert");
 
-const l = () => console.log(JSON.stringify(arguments, null, 4));
+const projectName = "mongosharded";
 
 const commands = [
     {server:"mongocfg1", command: `rs.initiate({_id: "mongors1conf",configsvr: true, members: [{ _id : 0, host : "mongocfg1" },{ _id : 1, host : "mongocfg2" }, { _id : 2, host : "mongocfg3" }]})`},
@@ -14,16 +13,17 @@ const commands = [
     {server:"mongos1", command: `sh.addShard("mongors1/mongors1n1")`},
     {server:"mongors1n1", command: `use testDb`},
     {server:"mongos1", command: `sh.enableSharding("testDb")`},
+    {server:"mongos1", command: `use config\ndb.settings.save( { _id:"chunksize", value: 1 } )`},
     {server:"mongors1n1", command: `db.createCollection("testDb.testCollection")`},
-    {server:"mongos1", command: `sh.shardCollection("testDb.testCollection", {"shardingField" : 1})`}
+    {server:"mongos1", command: `sh.shardCollection("testDb.testCollection", {"_id" : 1})`}
 ];
 
-async function runCommand(containerIds, index) {
-    process.stdout.write(`Trying command number: ${index+1}/${commands.length} ... `);
-    const command = commands[index];
+const execArgs = {Cmd: ["mongo"], AttachStdin: true, AttachStdout: true, AttachStderr: true};
+const startArgs = {hijack: true, stdin: true, stdout:true, stderr:true};
 
-    const execArgs = {Cmd: ["mongo"], AttachStdin: true, AttachStdout: true, AttachStderr: true};
-    const startArgs = {hijack: true, stdin: true, stdout:true, stderr:true};
+async function runCommand(containerIds, index, attemptNumber) {
+    process.stdout.write(`Trying command number: ${(index+1).toString().padStart(Math.log10(commands.length) + 1)}/${commands.length} (attempt ${attemptNumber}) ... `);
+    const command = commands[index];
 
     const containerId = containerIds[command.server];
     if (containerId == null) {
@@ -45,7 +45,7 @@ async function runCommand(containerIds, index) {
         });
     while (true) {
         await sleep()
-        const log = await exec.inspect()
+        const log = await exec.inspect();
         const exitCode = log.ExitCode;
         if (exitCode == null) {
             continue
@@ -53,26 +53,31 @@ async function runCommand(containerIds, index) {
         if (exitCode === 0) {
             console.log(chalk.green("Success"));
             if (index + 1 in commands) {
-                runCommand(containerIds, index + 1)
+                runCommand(containerIds, index + 1, 1)
             } else {
                 terminate(containerIds)
             }
         } else {
             await sleep()
             console.log(chalk.red("Failed"));
-            runCommand(containerIds, index)
+            if (attemptNumber < 20) {
+                runCommand(containerIds, index, attemptNumber + 1)
+            } else {
+                console.log("Giving up");
+                process.exit(1)
+            }
         }
         break
     }
 }
 
 async function terminate(containerIds) {
-    docker.getContainer(containerIds["mongoExpress"])
-        .restart();
+    return insertToDatabase("mongodb://localhost:27019,localhost:27020", 100000)
+        .then(console.log("Completed"))
 }
 
 function sleep() {
-    return new Promise((resolve, reject) =>
+    return new Promise((resolve) =>
         setTimeout(resolve, 1000)
     )
 }
@@ -83,7 +88,8 @@ async function main() {
         .mapValues(p => p[0].Id)
         .value();
 
-    runCommand(containerIds, 0)
+    return await runCommand(containerIds, 0,1)
 }
 
+// noinspection JSIgnoredPromiseFromCall
 main();

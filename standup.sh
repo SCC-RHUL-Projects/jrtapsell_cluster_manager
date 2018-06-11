@@ -5,6 +5,7 @@ if [[ $EUID -ne 0 ]]; then
    echo "This script must be run as root" 
    exit 1
 fi
+pushd .
 
 docker-compose -f mongo-sharded/replica.yml stop
 docker-compose -f mongo-sharded/replica.yml rm -f
@@ -13,12 +14,14 @@ rm -rf mongo-sharded/data
 docker-compose -f mongo-sharded/replica.yml up --no-start
 docker-compose -f mongo-sharded/replica.yml start
 
-cd manager
+cd manager &&
 node ./index.js &&
+cd ../ &&
+./status.sh &&
 echo "Press any key to exit" &&
 read -n 1
 
-cd ../
+popd
 docker-compose -f mongo-sharded/replica.yml stop
 docker-compose -f mongo-sharded/replica.yml rm -f
 echo "Exiting"
