@@ -1,95 +1,128 @@
 
 version: '2'
 services:
-  mongors1n1:
-    container_name: mongors1n1
+  mongo_shard1_node1:
+    container_name: mongo_shard1_node1
     image: mongo
     command: mongod --shardsvr --replSet mongors1 --dbpath /data/db --port 27017
-    ports:
-      - 27017:27017
-    expose:
-      - "27017"
-    environment:
-      TERM: xterm
     volumes:
       - /etc/localtime:/etc/localtime:ro
-  mongors1n2:
-    container_name: mongors1n2
+  mongo_shard1_node2:
+    container_name: mongo_shard1_node2
     image: mongo
     command: mongod --shardsvr --replSet mongors1 --dbpath /data/db --port 27017
-    ports:
-      - 27027:27017
-    expose:
-      - "27017"
-    environment:
-      TERM: xterm
     volumes:
       - /etc/localtime:/etc/localtime:ro
-  mongors1n3:
-    container_name: mongors1n3
+  mongo_shard1_node3:
+    container_name: mongo_shard1_node3
     image: mongo
     command: mongod --shardsvr --replSet mongors1 --dbpath /data/db --port 27017
-    ports:
-      - 27037:27017
-    expose:
-      - "27017"
-    environment:
-      TERM: xterm
     volumes:
       - /etc/localtime:/etc/localtime:ro
-  mongocfg1:
-    container_name: mongocfg1
+  mongo_config1:
+    container_name: mongo_config1
     image: mongo
     command: mongod --configsvr --replSet mongors1conf --dbpath /data/db --port 27017
-    environment:
-      TERM: xterm
-    expose:
-      - "27017"
     volumes:
       - /etc/localtime:/etc/localtime:ro
-  mongocfg2:
-    container_name: mongocfg2
+  mongo_config2:
+    container_name: mongo_config2
     image: mongo
     command: mongod --configsvr --replSet mongors1conf --dbpath /data/db --port 27017
-    environment:
-      TERM: xterm
-    expose:
-      - "27017"
     volumes:
       - /etc/localtime:/etc/localtime:ro
-  mongocfg3:
-    container_name: mongocfg3
+  mongo_config3:
+    container_name: mongo_config3
     image: mongo
     command: mongod --configsvr --replSet mongors1conf --dbpath /data/db --port 27017
-    environment:
-      TERM: xterm
-    expose:
-      - "27017"
     volumes:
       - /etc/localtime:/etc/localtime:ro
+
+
+  mongo_shard2_node1:
+      container_name: mongo_shard2_node1
+      image: mongo
+      command: mongod --shardsvr --replSet mongors2 --dbpath /data/db --port 27017
+      volumes:
+        - /etc/localtime:/etc/localtime:ro
+      ports:
+        - 27021:27017
+  mongo_shard2_node2:
+      container_name: mongo_shard2_node2
+      image: mongo
+      command: mongod --shardsvr --replSet mongors2 --dbpath /data/db --port 27017
+      volumes:
+        - /etc/localtime:/etc/localtime:ro
+      ports:
+        - 27022:27017
+  mongo_shard2_node3:
+      container_name: mongo_shard2_node3
+      image: mongo
+      command: mongod --shardsvr --replSet mongors2 --dbpath /data/db --port 27017
+      volumes:
+        - /etc/localtime:/etc/localtime:ro
+      ports:
+        - 27023:27017
+
+
   mongos1:
     container_name: mongos1
     image: mongo
     depends_on:
-      - mongocfg1
-      - mongocfg2
-    command: mongos --configdb mongors1conf/mongocfg1:27017,mongocfg2:27017,mongocfg3:27017 --port 27017 --bind_ip 0.0.0.0
+      - mongo_config1
+      - mongo_config2
+    command: mongos --configdb mongors1conf/mongo_config1:27017,mongo_config2:27017,mongo_config3:27017 --port 27017 --bind_ip 0.0.0.0
     ports:
       - 27019:27017
-    expose:
-      - "27017"
     volumes:
       - /etc/localtime:/etc/localtime:ro
   mongos2:
     container_name: mongos2
     image: mongo
     depends_on:
-      - mongocfg1
-      - mongocfg2
-    command: mongos --configdb mongors1conf/mongocfg1:27017,mongocfg2:27017,mongocfg3:27017 --port 27017 --bind_ip 0.0.0.0
+      - mongo_config1
+      - mongo_config2
+    command: mongos --configdb mongors1conf/mongo_config1:27017,mongo_config2:27017,mongo_config3:27017  --port 27017 --bind_ip 0.0.0.0
     ports:
       - 27020:27017
-    expose:
-      - "27017"
     volumes:
       - /etc/localtime:/etc/localtime:ro
+
+  mongo-express-data1:
+    container_name: mongo-express-data1
+    image:  mongo-express
+    depends_on:
+      - mongos1
+    ports:
+      - 8081:8081
+    environment:
+      - "ME_CONFIG_MONGODB_ENABLE_ADMIN=true"
+      - "ME_CONFIG_MONGODB_SERVER=mongos1"
+
+  mongo-express-data2:
+    container_name: mongo-express-data2
+    image:  mongo-express
+    depends_on:
+      - mongos2
+    ports:
+      - 8082:8081
+    environment:
+      - "ME_CONFIG_MONGODB_ENABLE_ADMIN=true"
+      - "ME_CONFIG_MONGODB_SERVER=mongos2"
+
+  mongo-express-config:
+    container_name: mongo-express-config
+    image:  mongo-express
+    depends_on:
+      - mongo_config1
+      - mongo_config2
+      - mongo_config3
+    ports:
+      - 8083:8081
+    environment:
+      - "ME_CONFIG_MONGODB_ENABLE_ADMIN=true"
+      - "ME_CONFIG_MONGODB_SERVER=mongo_config1,mongo_config2,mongo_config3"
+
+  shard-viewer:
+    container_name: shard-viewer
+    image: shard-viewer

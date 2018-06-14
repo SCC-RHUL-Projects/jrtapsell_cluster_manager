@@ -8,13 +8,17 @@ const {insertToDatabase} = require("./insert");
 const projectName = "mongosharded";
 
 const commands = [
-    {server:"mongocfg1", command: `rs.initiate({_id: "mongors1conf",configsvr: true, members: [{ _id : 0, host : "mongocfg1" },{ _id : 1, host : "mongocfg2" }, { _id : 2, host : "mongocfg3" }]})`},
-    {server:"mongors1n1", command: `rs.initiate({_id : "mongors1", members: [{ _id : 0, host : "mongors1n1" },{ _id : 1, host : "mongors1n2" },{ _id : 2, host : "mongors1n3" }]})`},
-    {server:"mongos1", command: `sh.addShard("mongors1/mongors1n1")`},
-    {server:"mongors1n1", command: `use testDb`},
+    {server:"mongo_config1", command: `rs.initiate({_id: "mongors1conf",configsvr: true, members: [{ _id : 0, host : "mongo_config1:27017" },{ _id : 1, host : "mongo_config2:27017" }, { _id : 2, host : "mongo_config3:27017" }]})`},
+    {server:"mongo_shard1_node1", command: `rs.initiate({_id : "mongors1", members: [{ _id : 0, host : "mongo_shard1_node1:27017" },{ _id : 1, host : "mongo_shard1_node2:27017" },{ _id : 2, host : "mongo_shard1_node3:27017" }]})`},
+
+    {server:"mongo_shard2_node1", command: `rs.initiate({_id : "mongors2", members: [{ _id : 0, host : "mongo_shard2_node1:27017" },{ _id : 1, host : "mongo_shard2_node2:27017" },{ _id : 2, host : "mongo_shard2_node3:27017" }]})`},
+
+    {server:"mongos1", command: `sh.addShard("mongors1/mongo_shard1_node1")`},
+    {server:"mongos1", command: `sh.addShard("mongors2/mongo_shard2_node1")`},
+
     {server:"mongos1", command: `sh.enableSharding("testDb")`},
     {server:"mongos1", command: `use config\ndb.settings.save( { _id:"chunksize", value: 1 } )`},
-    {server:"mongors1n1", command: `db.createCollection("testDb.testCollection")`},
+    {server:"mongo_shard1_node1", command: `db.createCollection("testDb.testCollection")`},
     {server:"mongos1", command: `sh.shardCollection("testDb.testCollection", {"_id" : 1})`}
 ];
 
@@ -58,8 +62,8 @@ async function runCommand(containerIds, index, attemptNumber) {
                 terminate(containerIds)
             }
         } else {
-            await sleep()
             console.log(chalk.red("Failed"));
+            await sleep(2000)
             if (attemptNumber < 20) {
                 runCommand(containerIds, index, attemptNumber + 1)
             } else {
@@ -71,18 +75,34 @@ async function runCommand(containerIds, index, attemptNumber) {
     }
 }
 
-async function terminate(containerIds) {
-    return insertToDatabase("mongodb://localhost:27019,localhost:27020", 100000)
-        .then(console.log("Completed"))
+function restart(containerIds, containerName) {
+    return docker.getContainer(containerIds[containerName]).restart();
 }
 
-function sleep() {
+async function terminate(containerIds) {
+    await Promise.all(_.chain(_.range(10))
+        .map(p => {
+            return insertToDatabase("mongodb://localhost:27019,localhost:27020", 100000)
+                .then(console.log("Completed insertion", p))
+        })
+        .value()
+    );
+    console.log("------------------");
+    console.log(containerIds);
+    console.log("------------------");
+    await restart(containerIds, "mongo-express-data1");
+    await restart(containerIds, "mongo-express-data2");
+    await restart(containerIds, "mongo-express-config");
+    return null;
+}
+
+function sleep(time=1000) {
     return new Promise((resolve) =>
-        setTimeout(resolve, 1000)
+        setTimeout(resolve, time)
     )
 }
 async function main() {
-    const containerIds = _.chain(await docker.listContainers())
+    const containerIds = _.chain(await docker.listContainers({all: true}))
         .filter(p => p.Labels["com.docker.compose.project"] === projectName)
         .groupBy(p => p.Labels["com.docker.compose.service"])
         .mapValues(p => p[0].Id)
