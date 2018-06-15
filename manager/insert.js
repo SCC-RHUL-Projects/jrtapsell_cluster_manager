@@ -18,9 +18,9 @@ function insertToDatabase(connectionString, insertCount) {
                         payload: data
                     })
                 });
-                op.execute((err, data) => {
+                op.execute((err) => {
                     if (err) {
-                        throw err
+                        console.log("Insertion failed", err.message);
                     }
                     client.close();
                     resolve()

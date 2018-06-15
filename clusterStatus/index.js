@@ -1,4 +1,4 @@
-const {MongoClient} = require('mongodb');
+const {MongoClient} = require("mongodb");
 const fs = require("fs");
 const _ = require("lodash");
 const Hapi = require('hapi');
@@ -31,7 +31,7 @@ function listChunks() {
 
 const server = Hapi.server({
     port: 3000,
-    host: '0.0.0.0'
+    host: "0.0.0.0"
 });
 
 

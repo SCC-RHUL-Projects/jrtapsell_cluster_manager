@@ -43,6 +43,12 @@ const commands = [
 const execArgs = {Cmd: ["mongo"], AttachStdin: true, AttachStdout: true, AttachStderr: true};
 const startArgs = {hijack: true, stdin: true, stdout:true, stderr:true};
 
+function sleep(time=1000) {
+    return new Promise((resolve) =>
+        setTimeout(resolve, time)
+    )
+}
+
 async function runCommand(containerIds, index, attemptNumber) {
     process.stdout.write(`Trying command number: ${(index+1).toString().padStart(Math.log10(commands.length) + 1)}/${commands.length} (attempt ${attemptNumber}) ... `);
     const command = commands[index];
@@ -112,12 +118,6 @@ async function terminate(containerIds) {
     await restart(containerIds, "mongo-express-data2");
     await restart(containerIds, "mongo-express-config");
     return null;
-}
-
-function sleep(time=1000) {
-    return new Promise((resolve) =>
-        setTimeout(resolve, time)
-    )
 }
 async function main() {
     const containers = await docker.listContainers({all: true});

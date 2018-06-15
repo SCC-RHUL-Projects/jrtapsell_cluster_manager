@@ -1,4 +1,5 @@
-FROM node
+FROM node:10
+LABEL maintainer "James Tapsell"
 WORKDIR /app
-ADD ./ /app
+COPY ./ /app
 CMD ["node", "/app/index.js"]
