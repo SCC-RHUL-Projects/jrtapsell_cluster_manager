@@ -7,36 +7,48 @@ services:
     command: mongod --shardsvr --replSet mongors1 --dbpath /data/db --port 27017
     volumes:
       - /etc/localtime:/etc/localtime:ro
+    tmpfs:
+      - /data/db
   mongo_shard1_node2:
     container_name: mongo_shard1_node2
     image: mongo
     command: mongod --shardsvr --replSet mongors1 --dbpath /data/db --port 27017
     volumes:
       - /etc/localtime:/etc/localtime:ro
+    tmpfs:
+      - /data/db
   mongo_shard1_node3:
     container_name: mongo_shard1_node3
     image: mongo
     command: mongod --shardsvr --replSet mongors1 --dbpath /data/db --port 27017
     volumes:
       - /etc/localtime:/etc/localtime:ro
+    tmpfs:
+      - /data/db
   mongo_config1:
     container_name: mongo_config1
     image: mongo
     command: mongod --configsvr --replSet mongors1conf --dbpath /data/db --port 27017
     volumes:
       - /etc/localtime:/etc/localtime:ro
+    tmpfs:
+      - /data/db
   mongo_config2:
     container_name: mongo_config2
     image: mongo
     command: mongod --configsvr --replSet mongors1conf --dbpath /data/db --port 27017
     volumes:
       - /etc/localtime:/etc/localtime:ro
+    tmpfs:
+      - /data/db
   mongo_config3:
     container_name: mongo_config3
     image: mongo
     command: mongod --configsvr --replSet mongors1conf --dbpath /data/db --port 27017
     volumes:
       - /etc/localtime:/etc/localtime:ro
+    tmpfs:
+      - /data/db
 
 
   mongo_shard2_node1:
@@ -47,6 +59,8 @@ services:
         - /etc/localtime:/etc/localtime:ro
       ports:
         - 27021:27017
+      tmpfs:
+        - /data/db
   mongo_shard2_node2:
       container_name: mongo_shard2_node2
       image: mongo
@@ -55,6 +69,8 @@ services:
         - /etc/localtime:/etc/localtime:ro
       ports:
         - 27022:27017
+      tmpfs:
+        - /data/db
   mongo_shard2_node3:
       container_name: mongo_shard2_node3
       image: mongo
@@ -63,6 +79,8 @@ services:
         - /etc/localtime:/etc/localtime:ro
       ports:
         - 27023:27017
+      tmpfs:
+        - /data/db
 
 
   mongos1:
@@ -76,6 +94,8 @@ services:
       - 27019:27017
     volumes:
       - /etc/localtime:/etc/localtime:ro
+    tmpfs:
+      - /data/db
   mongos2:
     container_name: mongos2
     image: mongo
@@ -87,6 +107,8 @@ services:
       - 27020:27017
     volumes:
       - /etc/localtime:/etc/localtime:ro
+    tmpfs:
+      - /data/db
 
   mongo-express-data1:
     container_name: mongo-express-data1
@@ -126,3 +148,9 @@ services:
   shard-viewer:
     container_name: shard-viewer
     image: shard-viewer
+    ports:
+      - 8084:3000
+    depends_on:
+      - mongo_config1
+      - mongo_config2
+      - mongo_config3

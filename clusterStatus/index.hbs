@@ -1,0 +1,72 @@
+<html>
+<head>
+    <title>Chunk Distribution</title>
+    <style>
+        .chunk {
+            display: inline;
+        }
+        .mongors1 {
+            background: lightcoral;
+        }
+        .mongors2 {
+            background: lightblue;
+        }
+    </style>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+</head>
+<body>
+<h1>Chunk Distribution</h1>
+<div id="chart_div"></div>
+<div>
+    {{#if error}}
+        <h2>Error: {{error}}</h2>
+    {{else}}
+        {{#with totals}}
+            <div>mongors1 - {{mongors1}}, mongors2 - {{mongors2}}, total - {{total}}</div>
+        {{/with}}
+        {{#each chunks}}
+                <div class="chunk {{name}}">{{min}} -> {{max}} ({{name}})</div>
+        {{/each}}
+    {{/if}}
+</div>
+</body>
+<script>
+    setTimeout(() => window.location.reload(), 10000)
+
+    // Load the Visualization API and the corechart package.
+    google.charts.load('current', {'packages':['corechart']});
+
+    // Set a callback to run when the Google Visualization API is loaded.
+    google.charts.setOnLoadCallback(drawChart);
+
+    // Callback that creates and populates a data table,
+    // instantiates the pie chart, passes in the data and
+    // draws it.
+    function drawChart() {
+        const rawData = {{{totalsJSON}}};
+        delete rawData["total"];
+        // Create the data table.
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Node');
+        data.addColumn('number', 'Count');
+
+        data.addRows(
+            Object.keys(rawData)
+                    .map(p => [p, rawData[p]])
+                    .sort(p => p[0])
+                    .reverse());
+
+        // Set chart options
+        var options = {'title':'Chunk distribution',
+            'width':400,
+            'height':300,
+            'colors': [
+                "#CC4444",
+                "#4444CC"]};
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+    }
+</script>
+</html>

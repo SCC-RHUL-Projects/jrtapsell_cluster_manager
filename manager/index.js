@@ -1,5 +1,5 @@
-const Docker = require('dockerode');
-const docker = new Docker({socketPath: '/var/run/docker.sock'});
+const Docker = require("dockerode");
+const docker = new Docker({socketPath: "/var/run/docker.sock"});
 const _ = require("lodash");
 const chalk = require("chalk");
 
@@ -8,18 +8,36 @@ const {insertToDatabase} = require("./insert");
 const projectName = "mongosharded";
 
 const commands = [
-    {server:"mongo_config1", command: `rs.initiate({_id: "mongors1conf",configsvr: true, members: [{ _id : 0, host : "mongo_config1:27017" },{ _id : 1, host : "mongo_config2:27017" }, { _id : 2, host : "mongo_config3:27017" }]})`},
-    {server:"mongo_shard1_node1", command: `rs.initiate({_id : "mongors1", members: [{ _id : 0, host : "mongo_shard1_node1:27017" },{ _id : 1, host : "mongo_shard1_node2:27017" },{ _id : 2, host : "mongo_shard1_node3:27017" }]})`},
+    {
+        server:"mongo_config1",
+        command: `rs.initiate({_id: "mongors1conf",configsvr: true, members: [{ _id : 0, host : "mongo_config1:27017" },{ _id : 1, host : "mongo_config2:27017" }, { _id : 2, host : "mongo_config3:27017" }]})`},
+    {
+        server:"mongo_shard1_node1",
+        command: `rs.initiate({_id : "mongors1", members: [{ _id : 0, host : "mongo_shard1_node1:27017" },{ _id : 1, host : "mongo_shard1_node2:27017" },{ _id : 2, host : "mongo_shard1_node3:27017" }]})`},
 
-    {server:"mongo_shard2_node1", command: `rs.initiate({_id : "mongors2", members: [{ _id : 0, host : "mongo_shard2_node1:27017" },{ _id : 1, host : "mongo_shard2_node2:27017" },{ _id : 2, host : "mongo_shard2_node3:27017" }]})`},
+    {
+        server:"mongo_shard2_node1",
+        command: `rs.initiate({_id : "mongors2", members: [{ _id : 0, host : "mongo_shard2_node1:27017" },{ _id : 1, host : "mongo_shard2_node2:27017" },{ _id : 2, host : "mongo_shard2_node3:27017" }]})`},
 
-    {server:"mongos1", command: `sh.addShard("mongors1/mongo_shard1_node1")`},
-    {server:"mongos1", command: `sh.addShard("mongors2/mongo_shard2_node1")`},
+    {
+        server:"mongos1",
+        command: `sh.addShard("mongors1/mongo_shard1_node1")`},
+    {
+        server:"mongos1",
+        command: `sh.addShard("mongors2/mongo_shard2_node1")`},
 
-    {server:"mongos1", command: `sh.enableSharding("testDb")`},
-    {server:"mongos1", command: `use config\ndb.settings.save( { _id:"chunksize", value: 1 } )`},
-    {server:"mongo_shard1_node1", command: `db.createCollection("testDb.testCollection")`},
-    {server:"mongos1", command: `sh.shardCollection("testDb.testCollection", {"_id" : 1})`}
+    {
+        server:"mongos1",
+        command: `sh.enableSharding("testDb")`},
+    {
+        server:"mongos1",
+        command: `use config\ndb.settings.save( { _id:"chunksize", value: 1 } )`},
+    {
+        server:"mongo_shard1_node1",
+        command: `db.createCollection("testDb.testCollection")`},
+    {
+        server:"mongos1",
+        command: `sh.shardCollection("testDb.testCollection", {"_id" : 1})`}
 ];
 
 const execArgs = {Cmd: ["mongo"], AttachStdin: true, AttachStdout: true, AttachStderr: true};
@@ -30,7 +48,7 @@ async function runCommand(containerIds, index, attemptNumber) {
     const command = commands[index];
 
     const containerId = containerIds[command.server];
-    if (containerId == null) {
+    if (containerId === null) {
         throw Error(`Unknown container for ${JSON.stringify(command.server)}`)
     }
     const container = docker.getContainer(containerId);
@@ -102,10 +120,11 @@ function sleep(time=1000) {
     )
 }
 async function main() {
-    const containerIds = _.chain(await docker.listContainers({all: true}))
-        .filter(p => p.Labels["com.docker.compose.project"] === projectName)
-        .groupBy(p => p.Labels["com.docker.compose.service"])
-        .mapValues(p => p[0].Id)
+    const containers = await docker.listContainers({all: true});
+    const containerIds = _.chain(containers)
+        .filter((p) => p.Labels["com.docker.compose.project"] === projectName)
+        .groupBy((p) => p.Labels["com.docker.compose.service"])
+        .mapValues((p) => p[0].Id)
         .value();
 
     return await runCommand(containerIds, 0,1)

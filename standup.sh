@@ -2,11 +2,11 @@
 
 pushd .
 
-docker-compose -f mongo-sharded/replica.yml stop
-docker-compose -f mongo-sharded/replica.yml rm -fv
+docker-compose -f mongo-sharded/docker-compose.yml stop
+docker-compose -f mongo-sharded/docker-compose.yml rm -fv
 
-docker-compose -f mongo-sharded/replica.yml up --no-start
-docker-compose -f mongo-sharded/replica.yml start
+docker-compose -f mongo-sharded/docker-compose.yml up --no-start
+docker-compose -f mongo-sharded/docker-compose.yml start
 
 cd manager &&
 node ./index.js &&
@@ -19,6 +19,6 @@ echo "Press any key to exit"
 read -n 1
 
 popd
-docker-compose -f mongo-sharded/replica.yml stop
-docker-compose -f mongo-sharded/replica.yml rm -fv
+docker-compose -f mongo-sharded/docker-compose.yml stop
+docker-compose -f mongo-sharded/docker-compose.yml rm -fv
 echo "Exiting"
