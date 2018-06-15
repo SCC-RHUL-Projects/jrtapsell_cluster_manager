@@ -1,13 +1,19 @@
 const {MongoClient} = require('mongodb');
 const fs = require("fs");
 const _ = require("lodash");
-var Hapi = require('hapi');
+const Hapi = require('hapi');
 const {promisify} = require("util");
 const hbs = require("handlebars");
 
+const HTTP_OK = 200;
+
 function listChunks() {
     return MongoClient.connect("mongodb://mongo_config1,mongo_config2,mongo_config3?replicaSet=mongors1conf")
-        .then(p => p.db("config").collection("chunks").find({}).toArray())
+        .then(p => p
+            .db("config")
+            .collection("chunks")
+            .find({})
+            .toArray())
         .then(p => p
             .filter(p => p.ns === "testDb.testCollection" && p._id.startsWith("testDb.testCollection-_id_ObjectId"))
             .map(p => {
@@ -43,15 +49,17 @@ server.route({
         totals["mongors1"] |= 0;
         totals["mongors1"] |= 0;
         console.log(totals);
+
         const page = hbs.compile(passFile)({
             totals,
             totalsJSON: JSON.stringify(totals),
             chunks
         });
+
         return h
             .response(page)
             .type("text/html")
-            .code(200)
+            .code(HTTP_OK)
     }
 });
 
@@ -61,4 +69,5 @@ const init = async () => {
     console.log(`Server running at: ${server.info.uri}`);
 };
 
+// noinspection JSIgnoredPromiseFromCall
 init();

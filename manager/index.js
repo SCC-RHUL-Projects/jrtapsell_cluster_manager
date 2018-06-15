@@ -66,7 +66,7 @@ async function runCommand(containerIds, index, attemptNumber) {
             return args[0]
         });
     while (true) {
-        await sleep()
+        await sleep();
         const log = await exec.inspect();
         const exitCode = log.ExitCode;
         if (exitCode == null) {
@@ -81,7 +81,7 @@ async function runCommand(containerIds, index, attemptNumber) {
             }
         } else {
             console.log(chalk.red("Failed"));
-            await sleep(2000)
+            await sleep(2000);
             if (attemptNumber < 20) {
                 runCommand(containerIds, index, attemptNumber + 1)
             } else {
