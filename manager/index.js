@@ -130,6 +130,7 @@ async function main() {
         .mapValues((p) => p[0].Id)
         .value();
 
+    console.log(JSON.stringify(containerIds));
     return await runCommand(containerIds, 0,1)
 }
 
