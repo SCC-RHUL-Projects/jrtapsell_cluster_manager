@@ -5,7 +5,7 @@ const chalk = require("chalk");
 
 const {insertToDatabase, allTest} = require("./insert");
 
-const projectName = "mongosharded";
+const projectName = "mongo-sharded";
 
 const commands = [
     {
@@ -125,12 +125,12 @@ async function terminate(containerIds) {
 async function main() {
     const containers = await docker.listContainers({all: true});
     const containerIds = _.chain(containers)
-        .filter((p) => p.Labels["com.docker.compose.project"].replace("-", "") === projectName)
+        .filter((p) => p.Labels["com.docker.compose.project"] === projectName)
         .groupBy((p) => p.Labels["com.docker.compose.service"])
         .mapValues((p) => p[0].Id)
         .value();
 
-    console.log(JSON.stringify(containerIds));
+    //console.log(JSON.stringify(containerIds));
     return await runCommand(containerIds, 0,1)
 }
 

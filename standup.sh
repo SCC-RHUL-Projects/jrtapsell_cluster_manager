@@ -12,11 +12,11 @@ docker-compose rm -fv
 docker-compose up --no-start
 docker-compose start
 cd ../
-cd manager &&
-node ./index.js &&
-cd ../ &&
-echo "Waiting 10 seconds to wait for balance";
-sleep 10&&
+cd manager
+node ./index.js
+cd ../
+echo "Waiting 10 seconds to wait for balance"
+sleep 10
 # ./status.sh &&
 echo "Press any key to exit"
 
