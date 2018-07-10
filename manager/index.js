@@ -3,7 +3,7 @@ const docker = new Docker({socketPath: "/var/run/docker.sock"});
 const _ = require("lodash");
 const chalk = require("chalk");
 
-const {insertToDatabase} = require("./insert");
+const {insertToDatabase, allTest} = require("./insert");
 
 const projectName = "mongosharded";
 
@@ -111,12 +111,15 @@ async function terminate(containerIds) {
         })
         .value()
     );
-    console.log("------------------");
-    console.log(containerIds);
-    console.log("------------------");
+    //console.log("------------------");
+    //console.log(containerIds);
+    //console.log("------------------");
     await restart(containerIds, "mongo-express-data1");
     await restart(containerIds, "mongo-express-data2");
     await restart(containerIds, "mongo-express-config");
+
+    await allTest("mongodb://localhost:27019,localhost:27020");
+
     return null;
 }
 async function main() {

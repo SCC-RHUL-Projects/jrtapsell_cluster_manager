@@ -2,6 +2,7 @@ const m = require('mongodb').MongoClient;
 const fs = require("fs");
 const _ = require("lodash");
 
+const data = fs.readFileSync("./lorum.txt");
 function insertToDatabase(connectionString, insertCount) {
     return new Promise((resolve) => {
         m.connect(connectionString, function (err, client) {
@@ -10,25 +11,45 @@ function insertToDatabase(connectionString, insertCount) {
             }
             const collection = client.db("testDb").collection("testCollection");
 
-            fs.readFile("./lorum.txt", (data) => {
-                const op = collection.initializeUnorderedBulkOp();
-                _.range(insertCount).forEach((i) => {
-                    op.insert({
-                        number: i,
-                        payload: data
-                    })
-                });
-                op.execute((err) => {
-                    if (err) {
-                        console.log("Insertion failed", err.message);
-                    }
-                    client.close();
-                    resolve()
+            const op = collection.initializeUnorderedBulkOp();
+
+            _.range(insertCount).forEach((i) => {
+                op.insert({
+                    number: i,
+                    payload: data
                 })
+            });
+
+            op.execute((err) => {
+                if (err) {
+                    console.log("Insertion failed", err.message);
+                }
+                client.close();
+                resolve()
             })
         });
     });
 }
+
+function allTest(connectionString) {
+    return new Promise((resolve) => {
+        m.connect(connectionString, function (err, client) {
+            const collection = client.db("testDb")
+                .collection("testCollection");
+
+            const data = collection.insertOne({
+                number: -1,
+                payload: "Test data"
+            });
+
+            console.log(data);
+            resolve()
+
+        })
+    })
+}
+
 module.exports = {
-    insertToDatabase
+    insertToDatabase,
+    allTest
 };

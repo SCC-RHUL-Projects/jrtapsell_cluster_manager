@@ -1,0 +1,13 @@
+[
+  "mongo_shard1_node1",
+  "mongo_shard1_node2",
+  "mongo_shard1_node3",
+  "mongo_config1",
+  "mongo_config2",
+  "mongo_config3",
+  "mongo_shard2_node1",
+  "mongo_shard2_node2",
+  "mongo_shard2_node3",
+  "mongos1",
+  "mongos2"
+]
