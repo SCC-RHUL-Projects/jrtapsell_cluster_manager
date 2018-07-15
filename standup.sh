@@ -19,7 +19,7 @@ echo "Waiting 10 seconds to wait for balance"
 sleep 10
 # ./status.sh &&
 echo "Press any key to exit"
-
+../notify.sh "Insertions complete"
 read -n 1
 
 popd
