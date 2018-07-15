@@ -6,7 +6,8 @@ services:
     command: mongod --shardsvr --replSet mongors1 --dbpath /data/db --port 27017
     volumes:
       - '/etc/localtime:/etc/localtime:ro'
-      - '$PWD/logs/mongo_shard2_node2:/provenance'
+      - '$PWD/logs/mongo_shard1_node1.prov:/provenance'
+      - '$PWD/logs/mongo_shard1_node1.std:/stdout'
     ports:
       - '27111:27017'
     tmpfs:
@@ -17,7 +18,8 @@ services:
     command: mongod --shardsvr --replSet mongors1 --dbpath /data/db --port 27017
     volumes:
       - '/etc/localtime:/etc/localtime:ro'
-      - '$PWD/logs/mongo_shard2_node2:/provenance'
+      - '$PWD/logs/mongo_shard1_node2.prov:/provenance'
+      - '$PWD/logs/mongo_shard1_node2.std:/stdout'
     ports:
       - '27112:27017'
     tmpfs:
@@ -28,7 +30,8 @@ services:
     command: mongod --shardsvr --replSet mongors1 --dbpath /data/db --port 27017
     volumes:
       - '/etc/localtime:/etc/localtime:ro'
-      - '$PWD/logs/mongo_shard2_node2:/provenance'
+      - '$PWD/logs/mongo_shard1_node3.prov:/provenance'
+      - '$PWD/logs/mongo_shard1_node3.std:/stdout'
     ports:
       - '27113:27017'
     tmpfs:
@@ -39,7 +42,8 @@ services:
     command: mongod --shardsvr --replSet mongors2 --dbpath /data/db --port 27017
     volumes:
       - '/etc/localtime:/etc/localtime:ro'
-      - '$PWD/logs/mongo_shard2_node2:/provenance'
+      - '$PWD/logs/mongo_shard2_node1.prov:/provenance'
+      - '$PWD/logs/mongo_shard2_node1.std:/stdout'
     ports:
       - '27121:27017'
     tmpfs:
@@ -50,7 +54,8 @@ services:
     command: mongod --shardsvr --replSet mongors2 --dbpath /data/db --port 27017
     volumes:
       - '/etc/localtime:/etc/localtime:ro'
-      - '$PWD/logs/mongo_shard2_node2:/provenance'
+      - '$PWD/logs/mongo_shard2_node2.prov:/provenance'
+      - '$PWD/logs/mongo_shard2_node2.std:/stdout'
     ports:
       - '27122:27017'
     tmpfs:
@@ -61,7 +66,8 @@ services:
     command: mongod --shardsvr --replSet mongors2 --dbpath /data/db --port 27017
     volumes:
       - '/etc/localtime:/etc/localtime:ro'
-      - '$PWD/logs/mongo_shard2_node2:/provenance'
+      - '$PWD/logs/mongo_shard2_node3.prov:/provenance'
+      - '$PWD/logs/mongo_shard2_node3.std:/stdout'
     ports:
       - '27123:27017'
     tmpfs:
@@ -72,7 +78,8 @@ services:
     command: mongod --configsvr --replSet mongors1conf --dbpath /data/db --port 27017
     volumes:
       - '/etc/localtime:/etc/localtime:ro'
-      - '$PWD/logs/mongo_config1:/provenance'
+      - '$PWD/logs/mongo_config1.prov:/provenance'
+      - '$PWD/logs/mongo_config1.std:/stdout'
     ports:
       - '27201:27017'
     tmpfs:
@@ -83,7 +90,8 @@ services:
     command: mongod --configsvr --replSet mongors1conf --dbpath /data/db --port 27017
     volumes:
       - '/etc/localtime:/etc/localtime:ro'
-      - '$PWD/logs/mongo_config1:/provenance'
+      - '$PWD/logs/mongo_config2.prov:/provenance'
+      - '$PWD/logs/mongo_config2.std:/stdout'
     ports:
       - '27202:27017'
     tmpfs:
@@ -94,7 +102,8 @@ services:
     command: mongod --configsvr --replSet mongors1conf --dbpath /data/db --port 27017
     volumes:
       - '/etc/localtime:/etc/localtime:ro'
-      - '$PWD/logs/mongo_config1:/provenance'
+      - '$PWD/logs/mongo_config3.prov:/provenance'
+      - '$PWD/logs/mongo_config3.std:/stdout'
     ports:
       - '27203:27017'
     tmpfs:
@@ -113,7 +122,8 @@ services:
       - '27301:27017'
     volumes:
       - '/etc/localtime:/etc/localtime:ro'
-      - '$PWD/logs/mongos1:/provenance'
+      - '$PWD/logs/mongos1.prov:/provenance'
+      - '$PWD/logs/mongos1.std:/stdout'
     tmpfs:
       - /data/db
   mongos2:
@@ -130,7 +140,8 @@ services:
       - '27302:27017'
     volumes:
       - '/etc/localtime:/etc/localtime:ro'
-      - '$PWD/logs/mongos1:/provenance'
+      - '$PWD/logs/mongos2.prov:/provenance'
+      - '$PWD/logs/mongos2.std:/stdout'
     tmpfs:
       - /data/db
   shard-viewer:
