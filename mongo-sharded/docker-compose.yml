@@ -15,6 +15,9 @@ services:
       - '27111:27017'
     tmpfs:
       - /data/db
+    networks:
+      clusternet:
+        ipv4_address: 198.18.1.11
   mongo_shard1_node2:
     container_name: mongo_shard1_node2
     image: mongo_patched
@@ -30,6 +33,9 @@ services:
       - '27112:27017'
     tmpfs:
       - /data/db
+    networks:
+      clusternet:
+        ipv4_address: 198.18.1.12
   mongo_shard1_node3:
     container_name: mongo_shard1_node3
     image: mongo_patched
@@ -45,6 +51,9 @@ services:
       - '27113:27017'
     tmpfs:
       - /data/db
+    networks:
+      clusternet:
+        ipv4_address: 198.18.1.13
   mongo_shard2_node1:
     container_name: mongo_shard2_node1
     image: mongo_patched
@@ -60,6 +69,9 @@ services:
       - '27121:27017'
     tmpfs:
       - /data/db
+    networks:
+      clusternet:
+        ipv4_address: 198.18.1.21
   mongo_shard2_node2:
     container_name: mongo_shard2_node2
     image: mongo_patched
@@ -75,6 +87,9 @@ services:
       - '27122:27017'
     tmpfs:
       - /data/db
+    networks:
+      clusternet:
+        ipv4_address: 198.18.1.22
   mongo_shard2_node3:
     container_name: mongo_shard2_node3
     image: mongo_patched
@@ -90,6 +105,9 @@ services:
       - '27123:27017'
     tmpfs:
       - /data/db
+    networks:
+      clusternet:
+        ipv4_address: 198.18.1.23
   mongo_config1:
     container_name: mongo_config1
     image: mongo_patched
@@ -105,6 +123,9 @@ services:
       - '27201:27017'
     tmpfs:
       - /data/db
+    networks:
+      clusternet:
+        ipv4_address: 198.18.2.1
   mongo_config2:
     container_name: mongo_config2
     image: mongo_patched
@@ -120,6 +141,9 @@ services:
       - '27202:27017'
     tmpfs:
       - /data/db
+    networks:
+      clusternet:
+        ipv4_address: 198.18.2.2
   mongo_config3:
     container_name: mongo_config3
     image: mongo_patched
@@ -135,6 +159,9 @@ services:
       - '27203:27017'
     tmpfs:
       - /data/db
+    networks:
+      clusternet:
+        ipv4_address: 198.18.2.3
   mongos1:
     container_name: mongos1
     image: mongo_patched
@@ -154,6 +181,22 @@ services:
       - '$PWD/logs/mongos1.stderr:/stderr'
     tmpfs:
       - /data/db
+    networks:
+      clusternet:
+        ipv4_address: 198.18.3.1
+  mongo-express-data1:
+    container_name: mongo-express-data1
+    image: mongo-express
+    depends-on:
+      - mongos1
+    ports:
+      - '8081:8081'
+    environment:
+      - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+      - ME_CONFIG_MONGODB_SERVER=mongos1
+    networks:
+      clusternet:
+        ipv4_address: 198.18.4.1
   mongos2:
     container_name: mongos2
     image: mongo_patched
@@ -173,6 +216,22 @@ services:
       - '$PWD/logs/mongos2.stderr:/stderr'
     tmpfs:
       - /data/db
+    networks:
+      clusternet:
+        ipv4_address: 198.18.3.2
+  mongo-express-data2:
+    container_name: mongo-express-data2
+    image: mongo-express
+    depends-on:
+      - mongos2
+    ports:
+      - '8082:8081'
+    environment:
+      - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+      - ME_CONFIG_MONGODB_SERVER=mongos2
+    networks:
+      clusternet:
+        ipv4_address: 198.18.4.2
   shard-viewer:
     container_name: shard-viewer
     image: shard-viewer
@@ -182,6 +241,9 @@ services:
       - mongo_config1
       - mongo_config2
       - mongo_config3
+    networks:
+      clusternet:
+        ipv4_address: 198.18.5.1
   mongo-express-config:
     container_name: mongo-express-config
     image: mongo-express
@@ -194,3 +256,13 @@ services:
     environment:
       - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
       - 'ME_CONFIG_MONGODB_SERVER=mongo_config1,mongo_config2,mongo_config3'
+    networks:
+      clusternet:
+        ipv4_address: 198.18.5.2
+networks:
+  clusternet:
+    driver: bridge
+    ipam:
+      config:
+        subnet: 198.18.0.0/16
+        gateway: 198.18.0.1
