@@ -12,7 +12,7 @@ services:
       - '$PWD/logs/mongo_shard1_node1.stdout:/stdout'
       - '$PWD/logs/mongo_shard1_node1.stderr:/stderr'
     ports:
-      - '27111:27017'
+      - '127.0.0.1:27111:27017'
     tmpfs:
       - /data/db
     networks:
@@ -30,7 +30,7 @@ services:
       - '$PWD/logs/mongo_shard1_node2.stdout:/stdout'
       - '$PWD/logs/mongo_shard1_node2.stderr:/stderr'
     ports:
-      - '27112:27017'
+      - '127.0.0.1:27112:27017'
     tmpfs:
       - /data/db
     networks:
@@ -48,7 +48,7 @@ services:
       - '$PWD/logs/mongo_shard1_node3.stdout:/stdout'
       - '$PWD/logs/mongo_shard1_node3.stderr:/stderr'
     ports:
-      - '27113:27017'
+      - '127.0.0.1:27113:27017'
     tmpfs:
       - /data/db
     networks:
@@ -66,7 +66,7 @@ services:
       - '$PWD/logs/mongo_shard2_node1.stdout:/stdout'
       - '$PWD/logs/mongo_shard2_node1.stderr:/stderr'
     ports:
-      - '27121:27017'
+      - '127.0.0.1:27121:27017'
     tmpfs:
       - /data/db
     networks:
@@ -84,7 +84,7 @@ services:
       - '$PWD/logs/mongo_shard2_node2.stdout:/stdout'
       - '$PWD/logs/mongo_shard2_node2.stderr:/stderr'
     ports:
-      - '27122:27017'
+      - '127.0.0.1:27122:27017'
     tmpfs:
       - /data/db
     networks:
@@ -102,7 +102,7 @@ services:
       - '$PWD/logs/mongo_shard2_node3.stdout:/stdout'
       - '$PWD/logs/mongo_shard2_node3.stderr:/stderr'
     ports:
-      - '27123:27017'
+      - '127.0.0.1:27123:27017'
     tmpfs:
       - /data/db
     networks:
@@ -120,7 +120,7 @@ services:
       - '$PWD/logs/mongo_config1.stdout:/stdout'
       - '$PWD/logs/mongo_config1.stderr:/stderr'
     ports:
-      - '27201:27017'
+      - '127.0.0.1:27201:27017'
     tmpfs:
       - /data/db
     networks:
@@ -138,7 +138,7 @@ services:
       - '$PWD/logs/mongo_config2.stdout:/stdout'
       - '$PWD/logs/mongo_config2.stderr:/stderr'
     ports:
-      - '27202:27017'
+      - '127.0.0.1:27202:27017'
     tmpfs:
       - /data/db
     networks:
@@ -156,7 +156,7 @@ services:
       - '$PWD/logs/mongo_config3.stdout:/stdout'
       - '$PWD/logs/mongo_config3.stderr:/stderr'
     ports:
-      - '27203:27017'
+      - '127.0.0.1:27203:27017'
     tmpfs:
       - /data/db
     networks:
@@ -173,7 +173,8 @@ services:
       mongors1conf/mongo_config1:27017,mongo_config2:27017,mongo_config3:27017
       --port 27017 --bind_ip 0.0.0.0
     ports:
-      - '27301:27017'
+      - '127.0.0.1:27301:27017'
+      - '0.0.0.0:27017:27017'
     volumes:
       - '/etc/localtime:/etc/localtime:ro'
       - '$PWD/logs/mongos1.prov:/provenance'
@@ -190,7 +191,7 @@ services:
     depends_on:
       - mongos1
     ports:
-      - '8081:8081'
+      - '127.0.0.1:8081:8081'
     environment:
       - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
       - ME_CONFIG_MONGODB_SERVER=mongos1
@@ -208,7 +209,8 @@ services:
       mongors1conf/mongo_config1:27017,mongo_config2:27017,mongo_config3:27017
       --port 27017 --bind_ip 0.0.0.0
     ports:
-      - '27302:27017'
+      - '127.0.0.1:27302:27017'
+      - '0.0.0.0:27018:27017'
     volumes:
       - '/etc/localtime:/etc/localtime:ro'
       - '$PWD/logs/mongos2.prov:/provenance'
@@ -225,7 +227,7 @@ services:
     depends_on:
       - mongos2
     ports:
-      - '8082:8081'
+      - '127.0.0.1:8082:8081'
     environment:
       - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
       - ME_CONFIG_MONGODB_SERVER=mongos2
@@ -236,7 +238,7 @@ services:
     container_name: shard-viewer
     image: shard-viewer
     ports:
-      - '8084:3000'
+      - '127.0.0.1:8084:3000'
     depends_on:
       - mongo_config1
       - mongo_config2
@@ -252,7 +254,7 @@ services:
       - mongo_config2
       - mongo_config3
     ports:
-      - '8083:8081'
+      - '127.0.0.1:8083:8081'
     environment:
       - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
       - 'ME_CONFIG_MONGODB_SERVER=mongo_config1,mongo_config2,mongo_config3'
