@@ -1,8 +1,7 @@
 const {MongoClient} = require("mongodb");
 
 async function main() {
-    const client = new MongoClient("mongodb://localhost:27017,localhost:27018");
-    await client.open();
+    const client = await MongoClient.connect("mongodb://localhost:27017,localhost:27018");
     const collection = client
         .db("testDb")
         .collection("chunks");
