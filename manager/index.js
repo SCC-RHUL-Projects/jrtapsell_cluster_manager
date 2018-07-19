@@ -103,7 +103,17 @@ function restart(containerIds, containerName) {
 
 async function terminate(containerIds) {
     _.forEach(containerIds, (id, name) => {
-      docker.getContainer(id).inspect((p, data) => console.log(name, data.State));
+        await new Promise((resolve, reject) => {
+            docker.getContainer(id).inspect((err, data) => {
+                if (err) {
+                    return reject(err);
+                }
+                console.log(name);
+                console.log("\t", JSON.stringify(data.State));
+                console.log("\t", JSON.stringify(data.Labels));
+                resolve();
+            });
+        })
     });
     return null;
 }
