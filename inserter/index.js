@@ -34,7 +34,7 @@ async function main() {
         const allChunks = await configCollection.find({}).toArray();
         const associated = _.chain(allChunks)
             .map(p => p.shard)
-            .group()
+            .groupBy()
             .mapValues(p => p.length);
         const one = associated["mongors1"];
         const two = associated["mongors2"];
