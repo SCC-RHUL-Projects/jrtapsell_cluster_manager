@@ -35,7 +35,8 @@ async function main() {
         const associated = _.chain(allChunks)
             .map(p => p.shard)
             .groupBy()
-            .mapValues(p => p.length);
+            .mapValues(p => p.length)
+            .value();
         console.log("Balance state:", associated);
         const one = associated["mongors1"];
         const two = associated["mongors2"];
