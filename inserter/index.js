@@ -48,11 +48,11 @@ async function main() {
             return true;
         }
 
-        return !(max(one, two) * 0.8 < min(one, two));
+        return !(Math.max(one, two) * 0.8 < Math.min(one, two));
     }
     while (await unballanced()) {
         console.log("Waiting");
-        sleep(1000);
+        await sleep(1000);
     }
 
     await Promise.all(_.map(ids, async (value) => {
