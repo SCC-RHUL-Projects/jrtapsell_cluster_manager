@@ -25,8 +25,7 @@ function listChunks() {
                 "max": (maxId.toHexString ? maxId.toHexString() : null),
                 "name":p.shard
             }
-        }))
-        .catch(err => {return {"error": err.message}});
+        }));
 }
 
 const server = Hapi.server({
@@ -34,42 +33,41 @@ const server = Hapi.server({
     host: "0.0.0.0"
 });
 
-
-server.route({
-    method: 'GET',
-    path: '/',
-    handler: async function (request, h) {
-        const passFile = (await promisify(fs.readFile)("./index.hbs")).toString();
-        const chunks = await (listChunks().catch(p => {return {"error": p.message}}));
-        const totals = _.chain(chunks)
-            .groupBy(p => p.name)
-            .mapValues(p => p.length)
-            .value();
-        if (totals.length > 1) {
-            totals["total"] = Object.values(totals).reduce((p, q) => p + q);
-            totals["mongors1"] |= 0;
-            totals["mongors1"] |= 0;
-        } else {
-            totals["total"] = 0;
-            totals["mongors1"] = 0;
-            totals["mongors2"] = 0;
-        }
-        console.log(totals);
-
-        const page = hbs.compile(passFile)({
-            totals,
-            totalsJSON: JSON.stringify(totals),
-            chunks
-        });
-
-        return h
-            .response(page)
-            .type("text/html")
-            .code(HTTP_OK)
-    }
-});
-
 const init = async () => {
+    const passFile = (await promisify(fs.readFile)("./index.hbs")).toString();
+
+    server.route({
+        method: 'GET',
+        path: '/',
+        handler: async function (request, h) {
+            const chunks = await (listChunks().catch(p => {return {"error": p.message}}));
+            const totals = _.chain(chunks)
+                .groupBy(p => p.name)
+                .mapValues(p => p.length)
+                .value();
+            if (totals.length > 1) {
+                totals["total"] = Object.values(totals).reduce((p, q) => p + q);
+                totals["mongors1"] |= 0;
+                totals["mongors1"] |= 0;
+            } else {
+                totals["total"] = 0;
+                totals["mongors1"] = 0;
+                totals["mongors2"] = 0;
+            }
+            console.log(totals);
+
+            const page = hbs.compile(passFile)({
+                totals,
+                totalsJSON: JSON.stringify(totals),
+                chunks
+            });
+
+            return h
+                .response(page)
+                .type("text/html")
+                .code(HTTP_OK)
+        }
+    });
 
     await server.start();
     console.log(`Server running at: ${server.info.uri}`);
