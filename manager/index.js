@@ -102,14 +102,16 @@ function restart(containerIds, containerName) {
 }
 
 async function terminate(containerIds) {
+    await restart(containerIds, "mongo-express-data1");
+    await restart(containerIds, "mongo-express-data2");
+    await restart(containerIds, "mongo-express-config");
     await Promise.all(_.map(containerIds, async (id, name) => {
         await new Promise((resolve, reject) => {
             docker.getContainer(id).inspect((err, data) => {
                 if (err) {
                     return reject(err);
                 }
-                console.log(`${name} ${data.Name}`);
-                console.log("\t", JSON.stringify(data.State.Status));
+                console.log(`${name} - ${data.State.Status}`);
                 resolve();
             });
         })
