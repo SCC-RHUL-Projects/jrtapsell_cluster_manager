@@ -18,7 +18,6 @@ async function main() {
             "count": value,
             "bloat": text
         });
-        console.log(ins);
         return ins.insertedIds[0];
     }));
 
