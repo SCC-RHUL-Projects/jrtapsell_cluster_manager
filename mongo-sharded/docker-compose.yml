@@ -11,8 +11,11 @@ services:
       - '$PWD/logs/mongo_shard1_node1.prov:/provenance'
       - '$PWD/logs/mongo_shard1_node1.stdout:/stdout'
       - '$PWD/logs/mongo_shard1_node1.stderr:/stderr'
+      - '$PWD/keyfile:/keyfile'
     ports:
       - '127.0.0.1:27111:27017'
+    tmpfs:
+      - /data/db
     networks:
       clusternet:
         ipv4_address: 10.24.1.11
@@ -27,8 +30,11 @@ services:
       - '$PWD/logs/mongo_shard1_node2.prov:/provenance'
       - '$PWD/logs/mongo_shard1_node2.stdout:/stdout'
       - '$PWD/logs/mongo_shard1_node2.stderr:/stderr'
+      - '$PWD/keyfile:/keyfile'
     ports:
       - '127.0.0.1:27112:27017'
+    tmpfs:
+      - /data/db
     networks:
       clusternet:
         ipv4_address: 10.24.1.12
@@ -43,8 +49,11 @@ services:
       - '$PWD/logs/mongo_shard1_node3.prov:/provenance'
       - '$PWD/logs/mongo_shard1_node3.stdout:/stdout'
       - '$PWD/logs/mongo_shard1_node3.stderr:/stderr'
+      - '$PWD/keyfile:/keyfile'
     ports:
       - '127.0.0.1:27113:27017'
+    tmpfs:
+      - /data/db
     networks:
       clusternet:
         ipv4_address: 10.24.1.13
@@ -59,8 +68,11 @@ services:
       - '$PWD/logs/mongo_shard2_node1.prov:/provenance'
       - '$PWD/logs/mongo_shard2_node1.stdout:/stdout'
       - '$PWD/logs/mongo_shard2_node1.stderr:/stderr'
+      - '$PWD/keyfile:/keyfile'
     ports:
       - '127.0.0.1:27121:27017'
+    tmpfs:
+      - /data/db
     networks:
       clusternet:
         ipv4_address: 10.24.1.21
@@ -75,8 +87,11 @@ services:
       - '$PWD/logs/mongo_shard2_node2.prov:/provenance'
       - '$PWD/logs/mongo_shard2_node2.stdout:/stdout'
       - '$PWD/logs/mongo_shard2_node2.stderr:/stderr'
+      - '$PWD/keyfile:/keyfile'
     ports:
       - '127.0.0.1:27122:27017'
+    tmpfs:
+      - /data/db
     networks:
       clusternet:
         ipv4_address: 10.24.1.22
@@ -91,8 +106,11 @@ services:
       - '$PWD/logs/mongo_shard2_node3.prov:/provenance'
       - '$PWD/logs/mongo_shard2_node3.stdout:/stdout'
       - '$PWD/logs/mongo_shard2_node3.stderr:/stderr'
+      - '$PWD/keyfile:/keyfile'
     ports:
       - '127.0.0.1:27123:27017'
+    tmpfs:
+      - /data/db
     networks:
       clusternet:
         ipv4_address: 10.24.1.23
@@ -107,8 +125,11 @@ services:
       - '$PWD/logs/mongo_config1.prov:/provenance'
       - '$PWD/logs/mongo_config1.stdout:/stdout'
       - '$PWD/logs/mongo_config1.stderr:/stderr'
+      - '$PWD/keyfile:/keyfile'
     ports:
       - '127.0.0.1:27201:27017'
+    tmpfs:
+      - /data/db
     networks:
       clusternet:
         ipv4_address: 10.24.2.1
@@ -123,8 +144,11 @@ services:
       - '$PWD/logs/mongo_config2.prov:/provenance'
       - '$PWD/logs/mongo_config2.stdout:/stdout'
       - '$PWD/logs/mongo_config2.stderr:/stderr'
+      - '$PWD/keyfile:/keyfile'
     ports:
       - '127.0.0.1:27202:27017'
+    tmpfs:
+      - /data/db
     networks:
       clusternet:
         ipv4_address: 10.24.2.2
@@ -139,8 +163,11 @@ services:
       - '$PWD/logs/mongo_config3.prov:/provenance'
       - '$PWD/logs/mongo_config3.stdout:/stdout'
       - '$PWD/logs/mongo_config3.stderr:/stderr'
+      - '$PWD/keyfile:/keyfile'
     ports:
       - '127.0.0.1:27203:27017'
+    tmpfs:
+      - /data/db
     networks:
       clusternet:
         ipv4_address: 10.24.2.3
@@ -162,6 +189,9 @@ services:
       - '$PWD/logs/mongos1.prov:/provenance'
       - '$PWD/logs/mongos1.stdout:/stdout'
       - '$PWD/logs/mongos1.stderr:/stderr'
+      - '$PWD/keyfile:/keyfile'
+    tmpfs:
+      - /data/db
     networks:
       clusternet:
         ipv4_address: 10.24.3.1
@@ -196,6 +226,9 @@ services:
       - '$PWD/logs/mongos2.prov:/provenance'
       - '$PWD/logs/mongos2.stdout:/stdout'
       - '$PWD/logs/mongos2.stderr:/stderr'
+      - '$PWD/keyfile:/keyfile'
+    tmpfs:
+      - /data/db
     networks:
       clusternet:
         ipv4_address: 10.24.3.2
