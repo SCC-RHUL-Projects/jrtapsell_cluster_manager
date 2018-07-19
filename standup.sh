@@ -17,11 +17,9 @@ node ./index.js
 cd ../inserter/
 node ./index.js
 cd ../
-echo "Waiting 10 seconds to wait for balance"
-sleep 10
 # ./status.sh &&
-echo "Press any key to exit"
-read -n 1
+# echo "Press any key to exit"
+# read -n 1
 
 popd
 docker-compose -f mongo-sharded/docker-compose.yml stop
