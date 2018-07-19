@@ -13,7 +13,7 @@ async function main() {
         .collection("testCollection");
 
     const ids = await Promise.all(_.map(_.range(100), async (value) => {
-        const ins = await collection.insert({
+        const ins = await collection.insertOne({
             "text": "Hello World",
             "count": value,
             "bloat": text
@@ -24,7 +24,7 @@ async function main() {
     await Promise.all(_.map(ids, async (value) => {
         return collection.updateOne(
             {"_id": value},
-            {"text": "Goodbye"}
+            {"$set": {"text": "Goodbye"}}
         )
     }));
 
