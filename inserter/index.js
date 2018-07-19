@@ -18,6 +18,10 @@ async function main() {
             "count": value,
             "bloat": text
         });
+        if (!(ins.insertedIds)) {
+            console.log(ins);
+            process.exit(1);
+        }
         return ins.insertedIds[0];
     }));
 
