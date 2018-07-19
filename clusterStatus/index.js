@@ -2,13 +2,11 @@ const {MongoClient} = require("mongodb");
 const fs = require("fs");
 const _ = require("lodash");
 const Hapi = require('hapi');
-const {promisify} = require("util");
-const hbs = require("handlebars");
 
 const HTTP_OK = 200;
 
 function listChunks() {
-    return MongoClient.connect("mongodb://mongo_config1,mongo_config2,mongo_config3?replicaSet=mongors1conf")
+    return MongoClient.connect("mongodb://mongos1,mongos2")
         .then(p => p
             .db("config")
             .collection("chunks")
@@ -34,41 +32,40 @@ const server = Hapi.server({
 });
 
 const init = async () => {
-    const passFile = (await promisify(fs.readFile)("./index.hbs")).toString();
 
+    const index = fs.readFileSync("./index.html").toString();
     server.route({
         method: 'GET',
-        path: '/',
+        path: '/api',
         handler: async function (request, h) {
             const chunks = await (listChunks().catch(p => {return {"error": p.message}}));
             const totals = _.chain(chunks)
                 .groupBy(p => p.name)
                 .mapValues(p => p.length)
                 .value();
-            if (totals.length > 1) {
-                totals["total"] = Object.values(totals).reduce((p, q) => p + q);
-                totals["mongors1"] |= 0;
-                totals["mongors1"] |= 0;
-            } else {
-                totals["total"] = 0;
-                totals["mongors1"] = 0;
-                totals["mongors2"] = 0;
-            }
-            console.log(totals);
-
-            const page = hbs.compile(passFile)({
-                totals,
-                totalsJSON: JSON.stringify(totals),
-                chunks
-            });
+            totals["mongors1"] |= 0;
+            totals["mongors2"] |= 0;
 
             return h
-                .response(page)
-                .type("text/html")
+                .response(JSON.stringify({
+                    "all": chunks,
+                    "totals": totals
+                }))
+                .type("application/json")
                 .code(HTTP_OK)
         }
     });
 
+    server.route({
+        method: 'GET',
+        path: '/',
+        handler: async function(request, h) {
+            return h
+                .response(index)
+                .type("text/html")
+                .code(HTTP_OK);
+        }
+    });
     await server.start();
     console.log(`Server running at: ${server.info.uri}`);
 };

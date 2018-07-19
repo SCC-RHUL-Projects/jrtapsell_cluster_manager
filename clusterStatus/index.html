@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cluster Status</title>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
+    <style>
+        .shard_mongors1 {
+            background: #c44;
+        }
+        .shard_mongors2 {
+            background: #44c;
+        }
+        div#graph>*>* {margin:auto}
+        table {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cluster Status</h1>
+    <h2>Graph</h2>
+<div id="graph"></div>
+    <h2>Chunks</h2>
+<div id="chunks"></div>
+</body>
+<script id="chunk-template" type="text/x-handlebars-template">
+    <table>
+        <tr>
+            <th>ID</th><th>Shard</th><th>Min</th><th>Max</th>
+        </tr>
+        {{#each all}}
+        <tr class="shard_{{name}}">
+            <td>{{id}}</td>
+            <td>{{name}}</td>
+            <td>{{min}}</td>
+            <td>{{max}}</td>
+        </tr>
+        {{/each}}
+    </table>
+</script>
+<script>
+    function onLoaded() {
+
+        function tick() {
+            fetch("/api")
+                .then(p => p.json())
+                .then(data => {
+                    (()=> {
+                        const rawTemplate = document.getElementById("chunk-template").innerHTML;
+                        const template = Handlebars.compile(rawTemplate);
+                        document.getElementById("chunks").innerHTML = template(data);
+                    })();
+
+                    (() => {
+                        // Create the data table.
+                        const tableData = new google.visualization.DataTable();
+                        tableData.addColumn('string', 'Shard');
+                        tableData.addColumn('number', 'Count');
+                        tableData.addRows(
+                            Object.keys(data.totals)
+                                .sort()
+                                .map(p => [p, data.totals[p]])
+                        );
+
+                        // Set chart options
+                        const options = {
+                            'title': 'Chunk Distribution',
+                            'width': 600,
+                            'height': 500,
+                            'colors': [
+                                '#c44', '#44c'
+                            ]
+                        };
+
+                        // Instantiate and draw our chart, passing in some options.
+                        const chart = new google.visualization.PieChart(document.getElementById('graph'));
+                        chart.draw(tableData, options);
+                    })();
+
+                })
+        }
+        setInterval(tick, 2000);
+        tick();
+
+    }
+    // Load the Visualization API and the corechart package.
+    google.charts.load('current', {'packages':['corechart']});
+
+    // Set a callback to run when the Google Visualization API is loaded.
+    google.charts.setOnLoadCallback(onLoaded);
+
+</script>
+</html>
