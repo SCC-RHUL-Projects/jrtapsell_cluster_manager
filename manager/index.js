@@ -110,7 +110,6 @@ async function terminate(containerIds) {
                 }
                 console.log(`${name} ${data.Name}`);
                 console.log("\t", JSON.stringify(data.State.Status));
-                console.log("\t", JSON.stringify(data.Config.Labels));
                 resolve();
             });
         })
