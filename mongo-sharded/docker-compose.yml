@@ -2,6 +2,7 @@ version: '2'
 services:
   mongo_shard1_node1:
     container_name: mongo_shard1_node1
+    hostname: mongo_shard1_node1
     image: mongo_patched
     volumes:
       - '/etc/localtime:/etc/localtime:ro'
@@ -21,6 +22,7 @@ services:
         ipv4_address: 10.24.1.11
   mongo_shard1_node2:
     container_name: mongo_shard1_node2
+    hostname: mongo_shard1_node2
     image: mongo_patched
     volumes:
       - '/etc/localtime:/etc/localtime:ro'
@@ -40,6 +42,7 @@ services:
         ipv4_address: 10.24.1.12
   mongo_shard1_node3:
     container_name: mongo_shard1_node3
+    hostname: mongo_shard1_node3
     image: mongo_patched
     volumes:
       - '/etc/localtime:/etc/localtime:ro'
@@ -59,6 +62,7 @@ services:
         ipv4_address: 10.24.1.13
   mongo_shard2_node1:
     container_name: mongo_shard2_node1
+    hostname: mongo_shard2_node1
     image: mongo_patched
     volumes:
       - '/etc/localtime:/etc/localtime:ro'
@@ -78,6 +82,7 @@ services:
         ipv4_address: 10.24.1.21
   mongo_shard2_node2:
     container_name: mongo_shard2_node2
+    hostname: mongo_shard2_node2
     image: mongo_patched
     volumes:
       - '/etc/localtime:/etc/localtime:ro'
@@ -97,6 +102,7 @@ services:
         ipv4_address: 10.24.1.22
   mongo_shard2_node3:
     container_name: mongo_shard2_node3
+    hostname: mongo_shard2_node3
     image: mongo_patched
     volumes:
       - '/etc/localtime:/etc/localtime:ro'
@@ -116,6 +122,7 @@ services:
         ipv4_address: 10.24.1.23
   mongo_config1:
     container_name: mongo_config1
+    hostname: mongo_config1
     image: mongo_patched
     volumes:
       - '/etc/localtime:/etc/localtime:ro'
@@ -135,6 +142,7 @@ services:
         ipv4_address: 10.24.2.1
   mongo_config2:
     container_name: mongo_config2
+    hostname: mongo_config2
     image: mongo_patched
     volumes:
       - '/etc/localtime:/etc/localtime:ro'
@@ -154,6 +162,7 @@ services:
         ipv4_address: 10.24.2.2
   mongo_config3:
     container_name: mongo_config3
+    hostname: mongo_config3
     image: mongo_patched
     volumes:
       - '/etc/localtime:/etc/localtime:ro'
@@ -173,6 +182,7 @@ services:
         ipv4_address: 10.24.2.3
   mongos1:
     container_name: mongos1
+    hostname: mongos1
     image: mongo_patched
     volumes:
       - '/etc/localtime:/etc/localtime:ro'
@@ -210,6 +220,7 @@ services:
         ipv4_address: 10.24.4.1
   mongos2:
     container_name: mongos2
+    hostname: mongos2
     image: mongo_patched
     volumes:
       - '/etc/localtime:/etc/localtime:ro'
