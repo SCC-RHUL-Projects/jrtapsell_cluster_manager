@@ -17,6 +17,10 @@ async function main() {
         .db("testDb")
         .collection("testCollection");
 
+    const configCollection = client
+        .db("config")
+        .collection("chunks");
+
     const ids = await Promise.all(_.map(_.range(1000), async (value) => {
         const ins = await collection.insertOne({
             "text": "Hello World",
@@ -26,6 +30,23 @@ async function main() {
         return ins.insertedId;
     }));
 
+    async function unballanced() {
+        const allChunks = await configCollection.find({}).toArray();
+        const associated = _.chain(allChunks)
+            .map(p => p.shard)
+            .group()
+            .mapValues(p => p.length);
+        const one = associated["mongors1"];
+        const two = associated["mongors2"];
+
+        if (!one || !two) {
+            return false;
+        }
+
+        return (max(one, two) * 0.8 < min(one, two));
+    }
+    while (await unballanced()) {}
+
     await Promise.all(_.map(ids, async (value) => {
         return collection.updateOne(
             {"_id": value},
@@ -33,13 +54,11 @@ async function main() {
         )
     }));
 
-    /*
     await Promise.all(_.map(ids, async (value) => {
         return collection.deleteOne(
             {"_id": value}
         )
     }));
-    */
 
     await client.close();
 }
