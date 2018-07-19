@@ -108,7 +108,7 @@ async function terminate(containerIds) {
                 if (err) {
                     return reject(err);
                 }
-                console.log(name);
+                console.log(`${name} ${data.Name}`);
                 console.log("\t", JSON.stringify(data.State.Status));
                 console.log("\t", JSON.stringify(data.Config.Labels));
                 resolve();
@@ -120,7 +120,7 @@ async function terminate(containerIds) {
 async function main() {
     const containers = await docker.listContainers({all: true});
     const containerIds = _.chain(containers)
-//        .filter((p) => p.Labels["com.docker.compose.project"] === projectName)
+        .filter((p) => p.Labels["com.docker.compose.project"] === projectName)
         .groupBy((p) => p.Labels["com.docker.compose.service"])
         .mapValues((p) => p[0].Id)
         .value();
