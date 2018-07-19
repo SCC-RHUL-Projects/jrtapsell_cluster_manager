@@ -20,6 +20,23 @@ async function main() {
         });
         return ins.insertedIds[0];
     }));
+
+    await Promise.all(_.map(ids, async (value) => {
+        return collection.updateOne(
+            {"_id": value},
+            {"text": "Goodbye"}
+        )
+    }));
+
+    await Promise.all(_.map(ids, async (value) => {
+        return collection.deleteOne(
+            {"_id": value}
+        )
+    }));
+
+
+
+
     console.log(ids);
     await client.close();
 }
