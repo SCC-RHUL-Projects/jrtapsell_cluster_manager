@@ -18,7 +18,7 @@ async function main() {
             "count": value,
             "bloat": text
         });
-        return ins;
+        return ins.insertedIds[0];
     }));
     console.log(ids);
     await client.close();
