@@ -12,13 +12,15 @@ async function main() {
         .db("testDb")
         .collection("testCollection");
 
-    await Promise.all(_.map(_.range(100), async (value) => {
+    const ids = await Promise.all(_.map(_.range(100), async (value) => {
         const ins = await collection.insert({
             "text": "Hello World",
             "count": value,
             "bloat": text
         });
+        return ins._id;
     }));
+    console.log(ids);
     await client.close();
 }
 
