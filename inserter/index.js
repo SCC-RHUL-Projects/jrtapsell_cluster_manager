@@ -18,11 +18,7 @@ async function main() {
             "count": value,
             "bloat": text
         });
-        if (!(ins.insertedIds)) {
-            console.log(ins);
-            process.exit(1);
-        }
-        return ins.insertedIds[0];
+        return ins.insertedId;
     }));
 
     await Promise.all(_.map(ids, async (value) => {
