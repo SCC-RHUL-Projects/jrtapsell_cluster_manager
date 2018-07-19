@@ -106,7 +106,7 @@ function restart(containerIds, containerName) {
 async function terminate(containerIds) {
     await Promise.all(_.chain(_.range(10))
         .map(p => {
-            return insertToDatabase("mongodb://localhost:27301,localhost:27302", 100000)
+            return insertToDatabase("mongodb://localhost:27017,localhost:27018", 100000)
                 .then(console.log("Completed insertion", p))
         })
         .value()
@@ -118,7 +118,7 @@ async function terminate(containerIds) {
     await restart(containerIds, "mongo-express-data2");
     await restart(containerIds, "mongo-express-config");
 
-    await allTest("mongodb://localhost:27301,localhost:27302");
+    await allTest("mongodb://localhost:27017,localhost:27018");
 
     return null;
 }
