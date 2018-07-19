@@ -1,7 +1,7 @@
 const {MongoClient} = require("mongodb");
 
 async function main() {
-    const client = await MongoClient.connect("mongodb://localhost:27017,localhost:27018");
+    const client = await MongoClient.connect("mongodb://localhost:27017,localhost:27018",{ useNewUrlParser: true });
     const collection = client
         .db("testDb")
         .collection("chunks");
