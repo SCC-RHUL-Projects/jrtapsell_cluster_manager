@@ -109,8 +109,8 @@ async function terminate(containerIds) {
                     return reject(err);
                 }
                 console.log(name);
-                console.log("\t", JSON.stringify(data.State));
-                console.log("\t", JSON.stringify(data.Labels));
+                console.log("\t", JSON.stringify(data.State.Status));
+                console.log("\t", JSON.stringify(data.Config.Labels));
                 resolve();
             });
         })
