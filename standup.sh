@@ -14,7 +14,7 @@ docker-compose start
 cd ../
 cd manager
 node ./index.js
-cd ../manager
+cd ../inserter/
 node ./index.js
 cd ../
 echo "Waiting 10 seconds to wait for balance"
