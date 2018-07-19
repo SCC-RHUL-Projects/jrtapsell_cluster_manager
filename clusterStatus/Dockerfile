@@ -1,5 +1,6 @@
 FROM node:10
-LABEL maintainer "James Tapsell"
+CMD ["node", "/app/index.js"]
+LABEL maintainer="James Tapsell"
 WORKDIR /app
 COPY ./ /app
-CMD ["node", "/app/index.js"]
+RUN npm install
