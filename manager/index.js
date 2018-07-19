@@ -102,7 +102,7 @@ function restart(containerIds, containerName) {
 }
 
 async function terminate(containerIds) {
-    _.forEach(containerIds, (id, name) => {
+    await Promise.all(_.forEach(containerIds, async (id, name) => {
         await new Promise((resolve, reject) => {
             docker.getContainer(id).inspect((err, data) => {
                 if (err) {
@@ -114,7 +114,7 @@ async function terminate(containerIds) {
                 resolve();
             });
         })
-    });
+    }));
     return null;
 }
 async function main() {
