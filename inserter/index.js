@@ -17,7 +17,7 @@ async function main() {
         .db("testDb")
         .collection("testCollection");
 
-    const ids = await Promise.all(_.map(_.range(100), async (value) => {
+    const ids = await Promise.all(_.map(_.range(1000), async (value) => {
         const ins = await collection.insertOne({
             "text": "Hello World",
             "count": value,
