@@ -36,16 +36,21 @@ async function main() {
             .map(p => p.shard)
             .groupBy()
             .mapValues(p => p.length);
+        console.log("Balance state:", associated);
         const one = associated["mongors1"];
         const two = associated["mongors2"];
 
         if (!one || !two) {
-            return false;
+            return true;
+        }
+        if (one < 20 || two < 20) {
+            return true;
         }
 
-        return (max(one, two) * 0.8 < min(one, two));
+        return !(max(one, two) * 0.8 < min(one, two));
     }
     while (await unballanced()) {
+        console.log("Waiting");
         sleep(1000);
     }
 
