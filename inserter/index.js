@@ -45,7 +45,9 @@ async function main() {
 
         return (max(one, two) * 0.8 < min(one, two));
     }
-    while (await unballanced()) {}
+    while (await unballanced()) {
+        sleep(1000);
+    }
 
     await Promise.all(_.map(ids, async (value) => {
         return collection.updateOne(
