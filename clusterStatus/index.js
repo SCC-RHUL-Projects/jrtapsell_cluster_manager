@@ -45,9 +45,15 @@ server.route({
             .groupBy(p => p.name)
             .mapValues(p => p.length)
             .value();
-        totals["total"] = Object.values(totals).reduce((p,q) => p+q);
-        totals["mongors1"] |= 0;
-        totals["mongors1"] |= 0;
+        if (totals.length > 1) {
+            totals["total"] = Object.values(totals).reduce((p, q) => p + q);
+            totals["mongors1"] |= 0;
+            totals["mongors1"] |= 0;
+        } else {
+            totals["total"] = 0;
+            totals["mongors1"] = 0;
+            totals["mongors2"] = 0;
+        }
         console.log(totals);
 
         const page = hbs.compile(passFile)({
