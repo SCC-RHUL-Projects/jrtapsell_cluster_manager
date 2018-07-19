@@ -102,7 +102,7 @@ function restart(containerIds, containerName) {
 }
 
 async function terminate(containerIds) {
-    containerIds.forEach((id, name) => {
+    _.forEach(containerIds, (id, name) => {
       docker.getContainer(id).inspect(p => console.log(name, p));
     });
     return null;
