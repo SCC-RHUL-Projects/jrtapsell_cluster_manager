@@ -5,6 +5,11 @@ const {promisify} = require("util");
 
 const readPromise = promisify(fs.readFile);
 
+function sleep(time) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, time)
+    })
+}
 async function main() {
     const text = (await readPromise("./lorum.txt")).toString();
     const client = await MongoClient.connect("mongodb://localhost:27017,localhost:27018",{ useNewUrlParser: true });
@@ -21,6 +26,23 @@ async function main() {
         return ins.insertedId;
     }));
 
+    const chunks = client
+        .db("config")
+        .collection("chunks");
+
+    let counts, high, low;
+    do {
+        const data = await chunks.find({}).toArray();
+        counts = _.chain(data)
+            .groupBy(p => p.shard)
+            .mapValues(p => p.length)
+            .value();
+
+        high = _.maxBy(Object.keys(counts), p => counts[p]);
+        low = _.minBy(Object.keys(counts), p => counts[p]);
+        await sleep(1000);
+    } while (counts[high] * 0.8 > counts[low]);
+
     await Promise.all(_.map(ids, async (value) => {
         return collection.updateOne(
             {"_id": value},
@@ -34,10 +56,6 @@ async function main() {
         )
     }));
 
-
-
-
-    console.log(ids);
     await client.close();
 }
 
