@@ -3,8 +3,6 @@ const docker = new Docker({socketPath: "/var/run/docker.sock"});
 const _ = require("lodash");
 const chalk = require("chalk");
 
-const {insertToDatabase, allTest} = require("./insert");
-
 const projectName = "mongo-sharded";
 
 const commands = [
@@ -104,22 +102,9 @@ function restart(containerIds, containerName) {
 }
 
 async function terminate(containerIds) {
-    await Promise.all(_.chain(_.range(10))
-        .map(p => {
-            return insertToDatabase("mongodb://localhost:27017,localhost:27018", 100000)
-                .then(console.log("Completed insertion", p))
-        })
-        .value()
-    );
-    //console.log("------------------");
-    //console.log(containerIds);
-    //console.log("------------------");
-    await restart(containerIds, "mongo-express-data1");
-    await restart(containerIds, "mongo-express-data2");
-    await restart(containerIds, "mongo-express-config");
-
-    await allTest("mongodb://localhost:27017,localhost:27018");
-
+    containerIds.forEach((id, name) => {
+      docker.getContainer(id).inspect(p => console.log(name, p));
+    });
     return null;
 }
 async function main() {
