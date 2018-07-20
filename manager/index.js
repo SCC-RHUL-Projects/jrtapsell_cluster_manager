@@ -84,7 +84,7 @@ async function runCommand(containerIds, index, attemptNumber) {
             stream.write(command.command);
             stream.write("\n");
             stream.write("exit\n");
-            docker.modem.demuxStream(stream, process.stdout, process.stderr);
+            //docker.modem.demuxStream(stream, process.stdout, process.stderr);
             return args[0]
         });
     while (true) {

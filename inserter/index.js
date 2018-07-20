@@ -12,6 +12,7 @@ function sleep(time) {
 }
 async function main() {
     const text = (await readPromise("./lorum.txt")).toString();
+    console.log("Connecting...");
     const client = await MongoClient.connect("mongodb://admin:password@localhost:27017,localhost:27018/admin",{ useNewUrlParser: true });
     const collection = client
         .db("testDb")
@@ -21,7 +22,8 @@ async function main() {
         .db("config")
         .collection("chunks");
 
-    const ids = await Promise.all(_.map(_.range(1000), async (value) => {
+    console.log("Inserting...");
+    const ids = await Promise.all(_.map(_.range(100), async (value) => {
         const ins = await collection.insertOne({
             "text": "Hello World",
             "count": value,
@@ -30,6 +32,7 @@ async function main() {
         return ins.insertedId;
     }));
 
+    console.log("Balancing...");
     async function unballanced() {
         const allChunks = await configCollection.find({}).toArray();
         const associated = _.chain(allChunks)
@@ -55,6 +58,7 @@ async function main() {
         await sleep(1000);
     }
 
+    console.log("Updating...");
     await Promise.all(_.map(ids, async (value) => {
         return collection.updateOne(
             {"_id": value},
@@ -62,6 +66,7 @@ async function main() {
         )
     }));
 
+    console.log("Deleting...");
     await Promise.all(_.map(ids, async (value) => {
         return collection.deleteOne(
             {"_id": value}
