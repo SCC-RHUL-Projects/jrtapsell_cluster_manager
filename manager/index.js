@@ -38,7 +38,7 @@ const commands = [
         command: `sh.shardCollection("testDb.testCollection", {"_id" : 1})`},
     {
         server:"mongos1",
-        command:`db.getSiblingDB("admin").createUser({user:"admin",pwd:"password",roles:[{role:"clusterAdmin",db:"admin"},{role:"userAdmin",db: "admin"}]})`
+        command:`db.getSiblingDB("admin").createUser({user:"admin",pwd:"password",roles:[{role:"root",db: "admin"}]})`
     }
 ];
 
