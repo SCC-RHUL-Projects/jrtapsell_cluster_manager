@@ -26,16 +26,24 @@ const commands = [
 
     {
         server:"mongos1",
-        command: `sh.enableSharding("testDb")`},
+        command: `sh.enableSharding("testDb")`,
+        needsAuth: true
+    },
     {
         server:"mongos1",
-        command: `use config\ndb.settings.save( { _id:"chunksize", value: 1 } )`},
+        command: `use config\ndb.settings.save( { _id:"chunksize", value: 1 } )`,
+        needsAuth: true
+    },
     {
         server:"mongo_shard1_node1",
-        command: `db.createCollection("testDb.testCollection")`},
+        command: `db.createCollection("testDb.testCollection")`,
+        needsAuth: true
+    },
     {
         server:"mongos1",
-        command: `sh.shardCollection("testDb.testCollection", {"_id" : 1})`}
+        command: `sh.shardCollection("testDb.testCollection", {"_id" : 1})`,
+        needsAuth: true
+    }
 ];
 
 const execArgs = {Cmd: ["mongo"], AttachStdin: true, AttachStdout: true, AttachStderr: true};
@@ -64,13 +72,15 @@ async function runCommand(containerIds, index, attemptNumber) {
         ]))
         .then((args) => {
             stream = args[1];
-            if (!createdAccounts[command.server]) {
-                stream.write("db.getSiblingDB(\"admin\").createUser({user:\"admin\",pwd:\"password\",roles:[{role:\"root\",db: \"admin\"}]})");
+            if (command.needsAuth) {
+                if (!createdAccounts[command.server]) {
+                    stream.write("db.getSiblingDB(\"admin\").createUser({user:\"admin\",pwd:\"password\",roles:[{role:\"root\",db: \"admin\"}]})");
+                    stream.write("\n");
+                    createdAccounts[command.server] = true;
+                }
+                stream.write("db.getSiblingDB(\"admin\").auth(\"admin\", \"password\" )");
                 stream.write("\n");
-                createdAccounts[command.server] = true;
             }
-            stream.write("db.getSiblingDB(\"admin\").auth(\"admin\", \"password\" )");
-            stream.write("\n");
             stream.write(command.command);
             stream.write("\n");
             stream.write("exit\n");
