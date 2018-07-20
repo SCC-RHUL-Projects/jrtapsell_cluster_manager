@@ -35,11 +35,7 @@ const commands = [
         command: `db.createCollection("testDb.testCollection")`},
     {
         server:"mongos1",
-        command: `sh.shardCollection("testDb.testCollection", {"_id" : 1})`},
-    {
-        server:"mongos1",
-        command:`db.getSiblingDB("admin").createUser({user:"admin",pwd:"password",roles:[{role:"root",db: "admin"}]})`
-    }
+        command: `sh.shardCollection("testDb.testCollection", {"_id" : 1})`}
 ];
 
 const execArgs = {Cmd: ["mongo"], AttachStdin: true, AttachStdout: true, AttachStderr: true};
@@ -50,6 +46,7 @@ function sleep(time=1000) {
         setTimeout(resolve, time)
     )
 }
+const createdAccounts = {};
 
 async function runCommand(containerIds, index, attemptNumber) {
     process.stdout.write(`Trying command number: ${(index+1).toString().padStart(Math.log10(commands.length) + 1)}/${commands.length} (attempt ${attemptNumber}) ... `);
@@ -67,9 +64,16 @@ async function runCommand(containerIds, index, attemptNumber) {
         ]))
         .then((args) => {
             stream = args[1];
+            if (!createdAccounts[command.server]) {
+                stream.write("db.getSiblingDB(\"admin\").createUser({user:\"admin\",pwd:\"password\",roles:[{role:\"root\",db: \"admin\"}]})");
+                stream.write("\n");
+                createdAccounts[command.server] = true;
+            }
+            stream.write("db.getSiblingDB(\"admin\").auth(\"admin\", \"password\" )");
+            stream.write("\n");
             stream.write(command.command);
             stream.write("\n");
-            stream.write("exit\n")
+            stream.write("exit\n");
             //docker.modem.demuxStream(stream, process.stdout, process.stderr);
             return args[0]
         });
