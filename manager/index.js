@@ -35,7 +35,11 @@ const commands = [
         command: `db.createCollection("testDb.testCollection")`},
     {
         server:"mongos1",
-        command: `sh.shardCollection("testDb.testCollection", {"_id" : 1})`}
+        command: `sh.shardCollection("testDb.testCollection", {"_id" : 1})`},
+    {
+        server:"mongos1",
+        command:`db.getSiblingDB("admin").createUser({user:"admin",pwd:"password",roles:[{role:"clusterAdmin",db:"admin"},{role:"userAdmin",db: "admin"}]})`
+    }
 ];
 
 const execArgs = {Cmd: ["mongo"], AttachStdin: true, AttachStdout: true, AttachStderr: true};
@@ -104,7 +108,7 @@ function restart(containerIds, containerName) {
 async function terminate(containerIds) {
     await restart(containerIds, "mongo-express-data1");
     await restart(containerIds, "mongo-express-data2");
-    await restart(containerIds, "mongo-express-config");
+    //await restart(containerIds, "mongo-express-config");
     await Promise.all(_.map(containerIds, async (id, name) => {
         await new Promise((resolve, reject) => {
             docker.getContainer(id).inspect((err, data) => {

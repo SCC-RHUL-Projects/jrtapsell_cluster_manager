@@ -6,7 +6,7 @@ const Hapi = require('hapi');
 const HTTP_OK = 200;
 
 function listChunks() {
-    return MongoClient.connect("mongodb://mongos1,mongos2")
+    return MongoClient.connect("mongodb://admin:password@mongos1,mongos2")
         .then(p => p
             .db("config")
             .collection("chunks")
