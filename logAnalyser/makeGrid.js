@@ -15,12 +15,16 @@ async function main() {
 
     const rawData = await Promise.all(_.map(servers, serverName => read(`${LOG_DIR}/${serverName}.prov`)));
     const lines = rawData.map(allText => allText.split("\n").filter(line => line !== "").map(line => {
-        return JSON.parse(line)
+        try {
+            return JSON.parse(line)
+        } catch (e) {
+            throw Error(line)
+        }
     }));
     const serverInfos = _.chain(lines)
         .map(serverLines => {
             return _.chain(serverLines)
-                .map(line => {
+                .groupBy(line => {
                     const {commandName, event} = line;
                     if (line.event === "logCommandAuthzCheck") {
                         return "C_" + commandName;
@@ -28,11 +32,12 @@ async function main() {
                         return event;
                     }
                 })
-                .uniqBy()
+                .mapValues(p => p.length)
                 .value();
         })
         .value();
     const orderedEventTypes = _.chain(Object.values(serverInfos))
+        .map(p => Object.keys(p))
         .flatMap()
         .uniqBy()
         .value();
@@ -45,8 +50,9 @@ async function main() {
     const body = _.chain(servers)
         .map(serverName => serverName + orderedEventTypes.map(state => {
             const serverIndex = servers.indexOf(serverName);
-            if (serverInfos[serverIndex].indexOf(state) !== -1) {
-                return `,X`;
+            let data = serverInfos[serverIndex][state];
+            if (data !== undefined) {
+                return `,${data}`;
             } else {
                 return `,`;
             }
