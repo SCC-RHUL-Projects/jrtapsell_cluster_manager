@@ -10,7 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "chalk": "^2.4.1",
-    "lodash": "^4.17.10",
+    "lodash": "^4.17.16",
     "mongodb": "^3.0.10",
     "dockerode": "latest"
   }
